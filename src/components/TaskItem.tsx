@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
   taskText: {
     color: "#666",
     fontFamily: "Inter-Medium",
-    width: "60%",
+    width: "62%",
   },
   taskMarkerDone: {
     height: 16,
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     color: "#1DB863",
     textDecorationLine: "line-through",
     fontFamily: "Inter-Medium",
-    width: 100,
+    width: "62%",
   },
   taskDivider: {
     height: 30,
