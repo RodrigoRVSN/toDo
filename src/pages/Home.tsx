@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { Alert, StyleSheet, View } from "react-native";
 
 import { Header } from "../components/Header";
 import { Task, TasksList } from "../components/TasksList";
@@ -9,6 +9,15 @@ export function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
 
   function handleAddTask(newTaskTitle: string) {
+    const equalTask = tasks.find((task) => task.title === newTaskTitle);
+
+    if (equalTask) {
+      Alert.alert(
+        "Tarefa já existe",
+        "Ei, essa tarefa já existe! Crie uma tarefa com nome diferente."
+      );
+      return;
+    }
     const data = {
       id: new Date().getTime(),
       title: newTaskTitle,
@@ -26,8 +35,26 @@ export function Home() {
   }
 
   function handleRemoveTask(id: number) {
+    Alert.alert("Confirmar exclusão", "Deseja mesmo excluir a tarefa?", [
+      {
+        text: "cancelar",
+        style: "cancel",
+      },
+      { text: "Sim, remover", onPress: () => filterTasks(id) },
+    ]);
+  }
+
+  function filterTasks(id: number) {
     const filteredTasks = tasks.filter((task) => task.id !== id);
     setTasks(filteredTasks);
+  }
+
+  function handleEditTask(taskId: number, taskNewTitle: string) {
+    const editedTasks = tasks.map((task) => ({ ...task }));
+    const foundItem = editedTasks.find((task) => task.id === taskId);
+    if (!foundItem) return;
+    foundItem.title = taskNewTitle;
+    setTasks(editedTasks);
   }
 
   return (
@@ -40,6 +67,7 @@ export function Home() {
         tasks={tasks}
         toggleTaskDone={handleToggleTaskDone}
         removeTask={handleRemoveTask}
+        editTask={handleEditTask}
       />
     </View>
   );
