@@ -1,11 +1,19 @@
-import React from "react";
-import { Text, TouchableOpacity, View, Image, StyleSheet } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  Text,
+  TouchableOpacity,
+  View,
+  Image,
+  StyleSheet,
+  TextInput,
+} from "react-native";
 import Icon from "react-native-vector-icons/Feather";
 
 import { ItemWrapper } from "./ItemWrapper";
 
 import trashIcon from "../assets/icons/trash/trash.png";
 import editIcon from "../assets/icons/Path.png";
+import xIcon from "../assets/icons/X.png";
 import { Task } from "./TasksList";
 
 interface TaskItemProps {
@@ -23,6 +31,34 @@ export function TaskItem({
   removeTask,
   editTask,
 }: TaskItemProps) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [actualTask, setActualTask] = useState(item.title);
+  const textInputRef = useRef<TextInput>(null);
+
+  function handleStartEditing() {
+    setIsEditing(true);
+  }
+
+  function handleCancelEditing() {
+    setActualTask(item.title);
+    setIsEditing(false);
+  }
+
+  function handleSubmitEditing() {
+    editTask(item.id, actualTask);
+    setIsEditing(false);
+  }
+
+  useEffect(() => {
+    if (textInputRef.current) {
+      if (isEditing) {
+        textInputRef.current.focus();
+      } else {
+        textInputRef.current.blur();
+      }
+    }
+  }, [isEditing]);
+
   return (
     <>
       <View>
@@ -39,27 +75,40 @@ export function TaskItem({
             {item.done && <Icon name="check" size={12} color="#FFF" />}
           </View>
 
-          <Text style={item.done ? styles.taskTextDone : styles.taskText}>
-            {item.title}
-          </Text>
+          <TextInput
+            numberOfLines={1}
+            ref={textInputRef}
+            style={
+              item.done
+                ? [styles.taskTextDone, isEditing && { width: "80%" }]
+                : [styles.taskText, isEditing && { width: "80%" }]
+            }
+            value={actualTask}
+            onChangeText={setActualTask}
+            editable={isEditing}
+            onSubmitEditing={handleSubmitEditing}
+          />
         </TouchableOpacity>
       </View>
 
       {/* TODO: fix edit task content */}
-      <TouchableOpacity
-        testID={`trash-${index}`}
-        onPress={() => editTask(item.id, "a")}
-      >
-        <Image source={editIcon} />
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        testID={`trash-${index}`}
-        style={{ paddingHorizontal: 24 }}
-        onPress={() => removeTask(item.id)}
-      >
-        <Image source={trashIcon} />
-      </TouchableOpacity>
+      <View style={styles.iconsContainer}>
+        <TouchableOpacity
+          testID={`trash-${index}`}
+          onPress={isEditing ? handleCancelEditing : handleStartEditing}
+        >
+          {isEditing ? <Image source={xIcon} /> : <Image source={editIcon} />}
+        </TouchableOpacity>
+        <View style={styles.taskDivider} />
+        <TouchableOpacity
+          testID={`trash-${index}`}
+          disabled={isEditing}
+          onPress={() => removeTask(item.id)}
+          style={isEditing && { opacity: 0.2 }}
+        >
+          <Image source={trashIcon} />
+        </TouchableOpacity>
+      </View>
     </>
   );
 }
@@ -87,6 +136,7 @@ const styles = StyleSheet.create({
   taskText: {
     color: "#666",
     fontFamily: "Inter-Medium",
+    width: "60%",
   },
   taskMarkerDone: {
     height: 16,
@@ -101,5 +151,17 @@ const styles = StyleSheet.create({
     color: "#1DB863",
     textDecorationLine: "line-through",
     fontFamily: "Inter-Medium",
+    width: 100,
+  },
+  taskDivider: {
+    height: 30,
+    width: 1,
+    marginHorizontal: 20,
+    backgroundColor: "rgba(196, 196, 196, 0.24)",
+  },
+  iconsContainer: {
+    flexDirection: "row",
+    marginRight: 30,
+    alignItems: "center",
   },
 });
