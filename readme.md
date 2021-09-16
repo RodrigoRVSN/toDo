@@ -12,6 +12,12 @@
 
 ---
 
+<div align="center">
+  <img src="https://user-images.githubusercontent.com/75763403/133687445-1b049f6a-88e2-4773-bf68-95851be61321.png"/>
+</div>
+
+---
+
 # 🚀 How to execute
 
 ### - `git clone https://github.com/RodrigoRVSN/toDo.git`
